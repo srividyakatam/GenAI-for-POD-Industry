@@ -52,3 +52,17 @@
         width: 90%;
     }
 }
+
+.response-container {
+    max-width: 100%;
+    margin: 20px 0;
+    background-color: #f8f8f8; /* Light grey background */
+    border: 1px solid #ddd; /* Light border */
+    padding: 10px;
+    white-space: pre-wrap; /* Keeps the formatting of the JSON */
+    word-wrap: break-word; /* Ensures long text wraps */
+    overflow-wrap: break-word;
+    overflow-y: auto;
+    height: auto;
+}
+

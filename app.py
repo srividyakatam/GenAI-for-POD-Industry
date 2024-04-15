@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import openai
-import google_bard
+# import google_bard
 
 app = Flask(__name__)
+CORS(app, resources={r"/analyze-prompt": {"origins": "*"}})
 
 @app.route('/')
 def home():
@@ -11,31 +13,45 @@ def home():
 
 @app.route('/analyze-prompt', methods=['POST'])
 def analyze_prompt():
-    data = request.json
+    data = request.get_json()
+
     api_choice = data.get('api_choice')
     api_key = data.get('api_key')
-    prompt = data.get('prompt')
+    prompt_text = data.get('prompt')
 
-    if not all([api_choice, api_key, prompt]):
+    # Check if all required parameters are provided
+    if not all([api_choice, api_key, prompt_text]):
         return jsonify({'error': 'Missing data'}), 400
 
+    # Perform the analysis based on the API choice
     try:
         if api_choice == 'gpt4':
-            response = call_openai_gpt4(api_key, prompt)
+            openai.api_key = api_key
+            response = openai.Completion.create(
+                engine="davinci-002", # model
+                prompt=prompt_text,
+                max_tokens=150 # tokens
+            )
+            # Return only the text portion of the response
+            return jsonify({'response': response.choices[0].text})
+        
+            # messages = [{"role": "user", "content": prompt_text}]
+            # response = openai.ChatCompletion.create(
+            #     model="gpt-3.5-turbo-0301",
+            #     messages=messages,
+            #     temperature=0, 
+            #     )
+            # return response.choices[0].message["content"]
+            
         else:
-            response = call_google_bard(api_key, prompt)
-        return jsonify(response)
+            # Placeholder for the Google Bard API implementation
+            # return call_google_bard(api_key, prompt_text)
+            pass
     except Exception as e:
+        # If an exception occurred, return the error message
         return jsonify({'error': str(e)}), 500
+    
 
-def call_openai_gpt4(api_key, prompt):
-    openai.api_key = api_key
-    response = openai.Completion.create(prompt=prompt, engine="davinci-codex")  # or other suitable engine
-    return response.choices[0].text
-
-def call_google_bard(api_key, prompt):
-    # Implement the logic to call Google Bard API
-    pass
 
 if __name__ == '__main__':
     app.run(debug=True)

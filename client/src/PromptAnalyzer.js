@@ -3,22 +3,29 @@ import './PromptAnalyzer.css';
 
 function PromptAnalyzer() {
     // Component state and functions will go here
-    const [apiChoice, setApiChoice] = useState('gpt4');
-    const [apiKey, setApiKey] = useState('');
+    const [api_choice, setApiChoice] = useState('gpt4');
+    const [api_key, setApiKey] = useState('');
     const [prompt, setPrompt] = useState('');
     const [response, setResponse] = useState(null);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // Make API call to your backend
+        setResponse(null); 
+        // Make API call to your backend        
         try {
-            const response = await fetch('/analyze-prompt', {
+            const response = await fetch('http://127.0.0.1:5000/analyze-prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apiChoice, apiKey, prompt })
+                body: JSON.stringify({ api_choice, api_key, prompt })
             });
-            const data = await response.json();
-            setResponse(data.response || data.error);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const responseData = await response.json();
+            //setResponse(formatResponseText(responseData.response));
+            setResponse(responseData.response.replace(/\\n/g, '\n'));
+            
         } catch (error) {
             console.error('Error:', error);
         }
@@ -30,14 +37,14 @@ function PromptAnalyzer() {
             <div className="api-selection">
                 <label>
                     Select your API of choice:
-                    <select value={apiChoice} onChange={e => setApiChoice(e.target.value)}>
+                    <select value={api_choice} onChange={e => setApiChoice(e.target.value)}>
                         <option value="gpt4">OpenAI GPT-4</option>
                         <option value="google_bard">Google Bard</option>
                     </select>
                 </label>
                 <label>
                     API Key:
-                    <input type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="Provide your API key here..." />
+                    <input type="password" value={api_key} onChange={e => setApiKey(e.target.value)} placeholder="Provide your API key here..." />
                 </label>
             </div>
             <div className="prompt-input">
@@ -52,7 +59,12 @@ function PromptAnalyzer() {
                 />
             </div>
             <button type="submit" onClick={handleSubmit}>Analyze Prompt</button>
-            {response && <div><strong>Analysis Result:</strong> {response}</div>}
+            {response && (
+                <div className="response-container">
+                    <h3>Response from the AI:</h3>
+                    <pre>{JSON.stringify(response, null, 2)}</pre> {/* Format the response */}
+                </div>
+            )}
         </div>
     );
 

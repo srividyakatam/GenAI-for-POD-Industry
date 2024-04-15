@@ -1,0 +1,42 @@
+.prompt-templates-container {
+    margin: 20px;
+}
+
+.input-container {
+    margin-bottom: 20px;
+}
+
+.input-container input[type="text"],
+.input-container textarea {
+    width: 100%; 
+    padding: 10px;
+    box-sizing: border-box; 
+    margin-bottom: 20px;
+    display: block; 
+}
+
+.input-container input[type="text"] {
+    min-width: 600px; 
+}
+
+.input-container textarea {
+    min-height: 200px; 
+    min-width: 3000px; 
+}
+
+@media screen and (max-width: 1200px) {
+    .input-container input[type="text"],
+    .input-container textarea {
+        width: 100%;
+        min-width: unset; 
+    }
+}
+
+.button-container {
+    text-align: left; 
+}
+
+.button-container button {
+    padding: 10px 15px;
+    margin-top: 10px;
+}
